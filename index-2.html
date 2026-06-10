@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kraftraum – JHG P-Seminar</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0A0A0A;
+    --surface: #141414;
+    --card: #1C1C1C;
+    --card2: #222222;
+    --border: #2A2A2A;
+    --yellow: #F5C200;
+    --yellow-soft: rgba(245,194,0,0.12);
+    --text: #F0F0F0;
+    --sub: #888;
+    --sub2: #555;
+    --r: 12px;
+    --r2: 8px;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    min-height: 100vh; line-height: 1.5; overflow-x: hidden;
+  }
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,10,0.88);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    height: 56px; display: flex; align-items: center;
+    padding: 0 28px; gap: 20px;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 9px; text-decoration: none;
+    font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px;
+    flex-shrink: 0;
+  }
+  .nav-dot { width: 9px; height: 9px; background: var(--yellow); border-radius: 50%; }
+  .nav-sub { font-weight: 400; color: var(--sub); font-size: 13px; margin-left: 2px; }
+  .nav-spacer { flex: 1; }
+  .nav-badge {
+    background: var(--yellow-soft); border: 1px solid rgba(245,194,0,0.3);
+    color: var(--yellow); font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .hero {
+    padding: 52px 28px 40px;
+    max-width: 1080px; margin: 0 auto;
+  }
+  .hero-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.8px;
+    text-transform: uppercase; color: var(--yellow); margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-size: clamp(30px, 4.5vw, 48px); font-weight: 700;
+    letter-spacing: -1.2px; line-height: 1.1; margin-bottom: 12px;
+  }
+  .hero h1 em { font-style: normal; color: var(--yellow); }
+  .hero p { color: var(--sub); font-size: 15px; max-width: 480px; }
+  .layout {
+    max-width: 1080px; margin: 0 auto;
+    padding: 0 28px 80px;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .sidebar { position: sticky; top: 72px; }
+  .sidebar-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.4px;
+    text-transform: uppercase; color: var(--sub2);
+    padding: 0 0 10px; margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .muscle-list { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+  .muscle-btn {
+    display: flex; align-items: center; gap: 12px;
+    background: none; border: none; cursor: pointer;
+    color: var(--sub); text-align: left; width: 100%;
+    padding: 10px 12px; border-radius: var(--r2);
+    transition: background 0.18s, color 0.18s;
+    font-size: 14px;
+  }
+  .muscle-btn:hover { background: var(--card); color: var(--text); }
+  .muscle-btn:hover .muscle-svg { opacity: 0.7; }
+  .muscle-btn.active { background: var(--yellow-soft); color: var(--yellow); }
+  .muscle-btn.active .muscle-svg { opacity: 1; }
+  .muscle-btn.active .muscle-svg .highlight { fill: var(--yellow); }
+  .muscle-icon {
+    width: 36px; height: 36px; border-radius: var(--r2);
+    background: var(--card); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden;
+    transition: background 0.18s;
+  }
+  .muscle-btn.active .muscle-icon { background: rgba(245,194,0,0.15); }
+  .muscle-svg { width: 22px; height: 22px; opacity: 0.45; transition: opacity 0.18s; }
+  .muscle-svg .body-base { fill: #666; }
+  .muscle-svg .highlight { fill: #aaa; transition: fill 0.18s; }
+  .muscle-name { flex: 1; font-weight: 500; }
+  .muscle-count { font-size: 11px; color: var(--sub2); }
+  .content-area {}
+  .section-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .section-icon {
+    width: 42px; height: 42px; border-radius: var(--r);
+    background: var(--yellow-soft); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-icon svg { width: 24px; height: 24px; }
+  .section-icon svg .highlight { fill: var(--yellow); }
+  .section-icon svg .body-base { fill: rgba(245,194,0,0.3); }
+  .section-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .section-desc { font-size: 13px; color: var(--sub); margin-top: 2px; }
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 32px;
+  }
+  .exercise-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); overflow: hidden; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .exercise-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(245,194,0,0.4);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+  }
+  .exercise-card.active {
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 1px var(--yellow);
+  }
+  .card-thumb {
+    aspect-ratio: 16/9; background: var(--card2);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .card-thumb video { width: 100%; height: 100%; object-fit: cover; }
+  .card-thumb-svg { width: 40px; height: 40px; opacity: 0.12; }
+  .card-thumb-svg .body-base { fill: #ccc; }
+  .card-thumb-svg .highlight { fill: #fff; }
+  .play-pill {
+    position: absolute; bottom: 8px; right: 8px;
+    background: var(--yellow); border-radius: 20px;
+    padding: 3px 10px 3px 7px; display: flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; color: #000;
+  }
+  .play-pill svg { width: 9px; height: 9px; }
+  .card-body { padding: 12px 14px 14px; }
+  .card-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--yellow); margin-bottom: 5px;
+  }
+  .card-title { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 4px; }
+  .card-meta { font-size: 12px; color: var(--sub); }
+  .card-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+  .pill {
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 2px 8px; font-size: 11px; color: var(--sub);
+  }
+  .detail-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    margin-bottom: 32px;
+    display: none;
+  }
+  .detail-panel.open { display: block; }
+  .detail-video-wrap {
+    aspect-ratio: 16/9; background: #000; position: relative;
+  }
+  .detail-video-wrap video {
+    width: 100%; height: 100%; object-fit: contain; display: block;
+  }
+  .detail-no-video {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; color: var(--sub); background: var(--card);
+  }
+  .detail-no-video svg { opacity: 0.15; width: 48px; height: 48px; }
+  .detail-no-video svg .body-base { fill: #ccc; }
+  .detail-no-video svg .highlight { fill: #fff; }
+  .detail-no-video p { font-size: 13px; }
+  .detail-no-video code {
+    background: var(--card2); padding: 2px 8px; border-radius: 5px;
+    font-size: 12px; color: var(--text); font-family: monospace;
+  }
+  .detail-body { padding: 22px 24px 24px; }
+  .detail-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .detail-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .detail-sub { font-size: 13px; color: var(--sub); margin-top: 3px; }
+  .close-btn {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 50%; width: 34px; height: 34px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--sub); font-size: 14px;
+    transition: background 0.18s, color 0.18s;
+  }
+  .close-btn:hover { background: var(--yellow); color: #000; }
+  .detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .plan-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 16px 18px;
+  }
+  .plan-box-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--yellow); margin-bottom: 12px;
+  }
+  .plan-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .plan-row:last-child { border-bottom: none; }
+  .plan-row-label { color: var(--sub); }
+  .plan-row-val { font-weight: 600; }
+  .steps-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .step-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+  .step-num {
+    width: 22px; height: 22px; background: var(--yellow-soft);
+    border: 1px solid rgba(245,194,0,0.3);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: var(--yellow); flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { color: var(--sub); line-height: 1.5; }
+  .vid-progress { height: 3px; background: var(--border); }
+  .vid-progress-fill { height: 100%; background: var(--yellow); width: 0%; transition: width 0.3s; }
+  .footer {
+    max-width: 1080px; margin: 0 auto;
+    padding: 20px 28px 32px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--sub2); font-size: 12px;
+  }
+  @media (max-width: 740px) {
+    nav { padding: 0 16px; }
+    .hero { padding: 36px 16px 28px; }
+    .layout { grid-template-columns: 1fr; padding: 0 16px 60px; }
+    .sidebar { position: static; }
+    .muscle-list { flex-direction: row; flex-wrap: wrap; }
+    .muscle-btn { width: auto; padding: 7px 12px; }
+    .muscle-name { display: none; }
+    .detail-cols { grid-template-columns: 1fr; }
+    .footer { flex-direction: column; gap: 6px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">
+    <div class="nav-dot"></div>
+    JHG<span class="nav-sub">Kraftraum</span>
+  </a>
+  <div class="nav-spacer"></div>
+  <span class="nav-badge">P-Seminar 2025/26</span>
+</nav>
+
+<div class="hero">
+  <p class="hero-label">JohannesHeidenhain-Gymnasium · Kraftraum-Einführung</p>
+  <h1>Trainiere richtig –<br><em>von Anfang an.</em></h1>
+  <p>Wähle eine Muskelgruppe und lerne die Übungen mit Video-Tutorial und passendem Trainingsplan.</p>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Muskelgruppen</div>
+    <div class="muscle-list" id="muscle-list"></div>
+  </aside>
+
+  <main class="content-area">
+    <div class="section-header" id="section-header">
+      <div class="section-icon" id="section-icon-wrap"></div>
+      <div>
+        <div class="section-title" id="section-title">Alle Übungen</div>
+        <div class="section-desc" id="section-desc">Wähle eine Muskelgruppe</div>
+      </div>
+    </div>
+
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-video-wrap">
+        <video id="detail-video" controls preload="metadata"></video>
+        <div class="detail-no-video" id="detail-no-video" style="display:none;">
+          <svg viewBox="0 0 48 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="7" r="5" class="body-base"/>
+            <path d="M24 12 L24 34 M18 16 L30 16 M24 34 L18 48 M24 34 L30 48" stroke="#666" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <p>Videodatei nicht gefunden:</p>
+          <code id="detail-filename">–</code>
+        </div>
+      </div>
+      <div class="vid-progress"><div class="vid-progress-fill" id="vid-progress-fill"></div></div>
+      <div class="detail-body">
+        <div class="detail-head">
+          <div>
+            <div class="detail-title" id="detail-title">–</div>
+            <div class="detail-sub" id="detail-sub">–</div>
+          </div>
+          <button class="close-btn" onclick="closeDetail()" title="Schließen">✕</button>
+        </div>
+        <div class="detail-cols">
+          <div class="plan-box">
+            <div class="plan-box-title">Trainingsplan</div>
+            <div id="plan-rows"></div>
+          </div>
+          <div class="plan-box">
+            <div class="plan-box-title">Ausführung</div>
+            <ul class="steps-list" id="steps-list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-grid" id="exercise-grid"></div>
+  </main>
+</div>
+
+<div class="footer">
+  <span>JohannesHeidenhain-Gymnasium · P-Seminar 2025/26</span>
+  <span>Alle Videos lokal · Offline verfügbar</span>
+</div>
+
+<script>
+/* ── SVG ICONS pro Muskelgruppe (inline, schlicht) ── */
+const svgIcons = {
+  bauch: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="24" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="11" y1="11" x2="21" y2="11" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="11" y="14" width="10" height="3" rx="1" class="highlight"/>
+    <rect x="11" y="18" width="10" height="3" rx="1" class="highlight"/>
+    <rect x="11" y="22" width="10" height="3" rx="1" class="highlight"/>
+    <line x1="16" y1="24" x2="12" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="20" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+  beine: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="20" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="11" y1="11" x2="21" y2="11" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M13 20 L11 30 L11 38" stroke="#666" stroke-width="2" stroke-linecap="round" class="highlight" style="stroke:#aaa"/>
+    <path d="M19 20 L21 30 L21 38" stroke="#666" stroke-width="2" stroke-linecap="round" class="highlight" style="stroke:#aaa"/>
+    <path d="M13 20 C13 20 11 25 11 30" stroke="#666" stroke-width="2.5" stroke-linecap="round" class="highlight" style="stroke:#aaa; opacity:0.5"/>
+  </svg>`,
+  brust: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="24" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <path d="M9 10 C6 12 5 16 8 18 C11 20 13 17 16 17" class="highlight" stroke="#aaa" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M23 10 C26 12 27 16 24 18 C21 20 19 17 16 17" class="highlight" stroke="#aaa" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <line x1="7" y1="11" x2="3" y2="20" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="25" y1="11" x2="29" y2="20" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="12" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="20" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+  ruecken: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="24" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <path d="M10 9 L6 18 L10 22 L16 20" class="highlight" stroke="#aaa" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M22 9 L26 18 L22 22 L16 20" class="highlight" stroke="#aaa" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="7" y1="11" x2="3" y2="20" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="25" y1="11" x2="29" y2="20" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="12" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="20" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+  schultern: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="24" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="7" cy="11" r="4" class="highlight" stroke="#aaa" stroke-width="1.8" fill="none"/>
+    <circle cx="25" cy="11" r="4" class="highlight" stroke="#aaa" stroke-width="1.8" fill="none"/>
+    <line x1="7" y1="15" x2="4" y2="24" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="25" y1="15" x2="28" y2="24" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="11" y1="11" x2="16" y2="13" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="21" y1="11" x2="16" y2="13" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="12" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="20" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+  arme: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="24" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="11" y1="11" x2="21" y2="11" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M7 11 L3 20 L6 28" class="highlight" stroke="#aaa" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M25 11 L29 20 L26 28" class="highlight" stroke="#aaa" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="16" y1="24" x2="12" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="16" y1="24" x2="20" y2="36" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+  hueften: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="22" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="11" y1="11" x2="21" y2="11" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M10 22 C6 22 5 26 7 29 C9 32 13 31 16 29" class="highlight" stroke="#aaa" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M22 22 C26 22 27 26 25 29 C23 32 19 31 16 29" class="highlight" stroke="#aaa" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <line x1="13" y1="29" x2="11" y2="38" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="19" y1="29" x2="21" y2="38" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+  ausdauer: `<svg viewBox="0 0 32 40" fill="none" class="muscle-svg" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="4" r="3" class="body-base"/>
+    <line x1="16" y1="7" x2="16" y2="20" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="11" y1="11" x2="21" y2="11" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M16 13 C13 15 10 14 9 17 C8 20 11 22 14 21 L16 20 L18 21 C21 22 24 20 23 17 C22 14 19 15 16 13Z" class="highlight" stroke="none" fill="#aaa" opacity="0.6"/>
+    <line x1="16" y1="20" x2="13" y2="30" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="16" y1="20" x2="19" y2="30" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="13" y1="30" x2="11" y2="38" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+    <line x1="19" y1="30" x2="21" y2="38" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+};
+
+const data = {
+  muscleGroups: [
+    { id: "brust",    name: "Brust",     svgKey: "brust",    desc: "Brustmuskulatur, Trizeps" },
+    { id: "ruecken",  name: "Rücken",    svgKey: "ruecken",  desc: "Latissimus, Trapez, Rückenstrecker" },
+    { id: "schultern",name: "Schultern", svgKey: "schultern",desc: "Deltoideus, Trapez" },
+    { id: "arme",     name: "Arme",      svgKey: "arme",     desc: "Bizeps, Trizeps, Unterarme" },
+    { id: "beine",    name: "Beine",     svgKey: "beine",    desc: "Quadrizeps, Hamstrings, Waden" },
+    { id: "bauch",    name: "Bauch",     svgKey: "bauch",    desc: "Core, Bauchmuskulatur" },
+    { id: "hueften",  name: "Hüfte",     svgKey: "hueften",  desc: "Hüftbeuger, Gesäß, Abduktoren" },
+    { id: "ausdauer", name: "Ausdauer",  svgKey: "ausdauer", desc: "Ganzkörper, Cardio" },
+  ],
+  exercises: [
+    {
+      id: "bauchbank", group: "bauch", title: "Bauchbank", level: "Anfänger",
+      file: "bauchbank.mp4",
+      muscles: ["Rectus abdominis", "Obliques", "Core"],
+      plan: { saetze: 3, wiederholungen: "15–20", pause: "45 Sek", frequenz: "3× / Woche" },
+      steps: [
+        "Auf die Bauchbank setzen, Füße unter den Polstern fixieren",
+        "Arme vor der Brust kreuzen oder hinter dem Kopf",
+        "Oberkörper kontrolliert nach hinten neigen – nicht ganz ablegen",
+        "Bauch anspannen und wieder aufrichten"
+      ]
+    },
+    {
+      id: "beinpresse", group: "beine", title: "Beinpresse", level: "Anfänger",
+      file: "beinpresse.mp4",
+      muscles: ["Quadrizeps", "Gesäß", "Hamstrings"],
+      plan: { saetze: 3, wiederholungen: "12–15", pause: "90 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Füße schulterbreit auf der Druckplatte platzieren",
+        "Knie beim Absenken nicht über 90° beugen",
+        "Kontrolliert drücken – Beine am Ende nicht ganz strecken",
+        "Unterer Rücken immer flach an der Rückenlehne lassen"
+      ]
+    },
+    {
+      id: "brustdruecken", group: "brust", title: "Brustdrücken", level: "Anfänger",
+      file: "brustdruecken.mp4",
+      muscles: ["Brust", "Trizeps", "Schultern"],
+      plan: { saetze: 3, wiederholungen: "10–12", pause: "90 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Schulterbreiter Griff, Stange auf Brusthöhe",
+        "Stange langsam zur Brust senken – Ellenbogen ca. 45° angewinkelt",
+        "Explosiv nach oben drücken, Arme nicht ganz strecken",
+        "Rücken leicht gewölbt, Füße flach auf dem Boden"
+      ]
+    },
+    {
+      id: "crosswalker", group: "ausdauer", title: "Crosswalker", level: "Anfänger",
+      file: "crosswalker.mp4",
+      muscles: ["Ganzkörper", "Ausdauer", "Beine"],
+      plan: { saetze: 1, wiederholungen: "10–20 Min", pause: "nach Bedarf", frequenz: "3× / Woche" },
+      steps: [
+        "Aufrechte Körperhaltung, leicht nach vorne lehnen",
+        "Griffe aktiv mit den Armen ziehen und drücken",
+        "Gleichmäßiges Tempo – nicht zu schnell starten",
+        "Schritttempo und Widerstand nach Kondition anpassen"
+      ]
+    },
+    {
+      id: "dips", group: "brust", title: "Dips", level: "Fortgeschritten",
+      file: "dips.mp4",
+      muscles: ["Brust", "Trizeps", "Schultern"],
+      plan: { saetze: 3, wiederholungen: "8–10", pause: "90 Sek", frequenz: "1× / Woche" },
+      steps: [
+        "Körper leicht nach vorne neigen für mehr Brustbeteiligung",
+        "Ellenbogen führen nach hinten – nicht nach außen aufklappen",
+        "Tief genug absenken bis ca. 90° im Ellenbogen",
+        "Kontrolliert nach oben drücken – nicht durchstrecken"
+      ]
+    },
+    {
+      id: "huefttrainer", group: "hueften", title: "Hüfttrainer", level: "Anfänger",
+      file: "huefttrainer.mp4",
+      muscles: ["Hüftbeuger", "Abduktoren", "Gesäß"],
+      plan: { saetze: 3, wiederholungen: "15", pause: "60 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Aufrecht sitzen, Rücken an der Stütze",
+        "Beine gegen den Widerstand nach außen drücken (Abduktion) oder zusammenführen",
+        "Bewegung langsam und kontrolliert ausführen",
+        "Kurz in der Endposition halten, dann zurück"
+      ]
+    },
+    {
+      id: "klimmzuege", group: "ruecken", title: "Klimmzüge", level: "Fortgeschritten",
+      file: "klimmzuege.mp4",
+      muscles: ["Latissimus", "Bizeps", "Rhomboiden"],
+      plan: { saetze: 3, wiederholungen: "5–8", pause: "2 Min", frequenz: "2× / Woche" },
+      steps: [
+        "Schulterbreiter oder etwas breiterer Obergriff",
+        "Schulterblätter zusammenziehen und nach unten drücken – dann ziehen",
+        "Kinn über die Stange bringen, Ellenbogen zur Hüfte führen",
+        "Langsam und kontrolliert ablassen – volle Streckung"
+      ]
+    },
+    {
+      id: "preacher_curls", group: "arme", title: "Preacher Curls", level: "Anfänger",
+      file: "preacher_curls.mp4",
+      muscles: ["Bizeps", "Brachialis", "Unterarme"],
+      plan: { saetze: 3, wiederholungen: "10–12", pause: "60 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Oberarme flach auf das Schrägpolster legen",
+        "Untergriff am Gerät oder mit Hantel",
+        "Hantel langsam nach oben führen – Bizeps maximal kontrahieren",
+        "Langsam absenken bis zur nahezu vollen Streckung"
+      ]
+    },
+    {
+      id: "pullover", group: "brust", title: "Pull Over", level: "Fortgeschritten",
+      file: "pullover.mp4",
+      muscles: ["Brust", "Latissimus", "Trizeps"],
+      plan: { saetze: 3, wiederholungen: "10–12", pause: "75 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Auf der Bank liegen, Hantel oder Griff mit gestreckten Armen über dem Kopf",
+        "Arme leicht gebeugt halten – nicht ganz strecken",
+        "Hantel kontrolliert über den Kopf nach hinten führen",
+        "Brust und Latissimus dehnen – dann zurück zur Ausgangsposition"
+      ]
+    },
+    {
+      id: "rueckenstation", group: "ruecken", title: "Rückenstation", level: "Anfänger",
+      file: "rueckenstation.mp4",
+      muscles: ["Rückenstrecker", "Gesäß", "Hamstrings"],
+      plan: { saetze: 3, wiederholungen: "12–15", pause: "75 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Hüfte auf dem Polster, Fersen unter den Haltepads einklinken",
+        "Arme vor der Brust kreuzen oder an den Schläfen",
+        "Oberkörper langsam nach unten absenken – Rücken gerade",
+        "Rücken aufrichten bis der Körper eine Linie bildet – nicht überstrecken"
+      ]
+    },
+    {
+      id: "rudergeraet", group: "ruecken", title: "Rudergerät", level: "Anfänger",
+      file: "rudergeraet.mp4",
+      muscles: ["Rücken", "Bizeps", "Schultern", "Beine"],
+      plan: { saetze: 1, wiederholungen: "10–15 Min", pause: "nach Bedarf", frequenz: "3× / Woche" },
+      steps: [
+        "Füße sicher in den Schlaufen, Knie leicht gebeugt zum Start",
+        "Zugphase: Beine strecken → Körper leicht zurücklehnen → Arme ziehen",
+        "Rückphase: Arme strecken → Oberkörper vorneigen → Knie beugen",
+        "Gleichmäßiger Rhythmus – Tempo und Widerstand anpassen"
+      ]
+    },
+    {
+      id: "schulterpresse", group: "schultern", title: "Schulterpresse", level: "Anfänger",
+      file: "schulterpresse.mp4",
+      muscles: ["Schultern", "Trizeps", "Trapez"],
+      plan: { saetze: 3, wiederholungen: "10–12", pause: "90 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Aufrecht sitzen, Rücken an der Lehne, Griffe auf Schulterhöhe",
+        "Senkrecht nach oben drücken – kontrolliert und gleichmäßig",
+        "Arme oben fast strecken – kurze Pause",
+        "Langsam zurück in die Ausgangsposition absenken"
+      ]
+    },
+    {
+      id: "zugapperat", group: "ruecken", title: "Zugapparat", level: "Anfänger",
+      file: "zugapperat.mp4",
+      muscles: ["Latissimus", "Bizeps", "hintere Schulter"],
+      plan: { saetze: 3, wiederholungen: "10–12", pause: "90 Sek", frequenz: "2× / Woche" },
+      steps: [
+        "Breiter Obergriff, Schulterblätter nach unten ziehen vor dem Zug",
+        "Stange zur oberen Brust ziehen – Ellenbogen nach unten und hinten führen",
+        "Kurz in der Endposition halten, Muskel bewusst anspannen",
+        "Stange langsam zurückführen – volle Streckung im Schultergelenk"
+      ]
+    },
+  ]
+};
+
+let activeGroup = null;
+let activeExercise = null;
+
+function renderSidebar() {
+  const list = document.getElementById('muscle-list');
+  list.innerHTML = data.muscleGroups.map(g => {
+    const count = data.exercises.filter(e => e.group === g.id).length;
+    if (count === 0) return '';
+    const svg = svgIcons[g.svgKey] || svgIcons['brust'];
+    return `<button class="muscle-btn${activeGroup === g.id ? ' active' : ''}" onclick="selectGroup('${g.id}')">
+      <div class="muscle-icon">${svg}</div>
+      <span class="muscle-name">${g.name}</span>
+      <span class="muscle-count">${count}</span>
+    </button>`;
+  }).join('');
+}
+
+function getSectionSvg(svgKey) {
+  const src = svgIcons[svgKey] || svgIcons['brust'];
+  return src
+    .replace('class="muscle-svg"', 'width="26" height="26"')
+    .replace(/class="body-base"/g, 'fill="rgba(245,194,0,0.35)"')
+    .replace(/class="highlight"/g, 'fill="none"')
+    .replace(/style="stroke:#aaa[^"]*"/g, 'stroke="#F5C200"')
+    .replace(/stroke="#666"/g, 'stroke="rgba(245,194,0,0.4)"')
+    .replace(/fill="#aaa"/g, 'fill="#F5C200"')
+    .replace(/stroke="#aaa"/g, 'stroke="#F5C200"');
+}
+
+function selectGroup(groupId) {
+  activeGroup = groupId;
+  activeExercise = null;
+  closeDetail();
+  renderSidebar();
+  const g = data.muscleGroups.find(x => x.id === groupId);
+  document.getElementById('section-icon-wrap').innerHTML = getSectionSvg(g.svgKey);
+  document.getElementById('section-title').textContent = g.name;
+  document.getElementById('section-desc').textContent = g.desc;
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('exercise-grid');
+  const exercises = activeGroup
+    ? data.exercises.filter(e => e.group === activeGroup)
+    : data.exercises;
+
+  grid.innerHTML = exercises.map(ex => {
+    const g = data.muscleGroups.find(m => m.id === ex.group);
+    const thumbSvg = (svgIcons[g ? g.svgKey : 'brust'] || svgIcons['brust'])
+      .replace('class="muscle-svg"', 'class="card-thumb-svg"');
+    return `<div class="exercise-card${activeExercise === ex.id ? ' active' : ''}" onclick="openExercise('${ex.id}')">
+      <div class="card-thumb">
+        ${thumbSvg}
+        <div class="play-pill">
+          <svg viewBox="0 0 10 10" fill="#000"><path d="M2 1l7 4-7 4V1z"/></svg>
+          Tutorial
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-tag">${ex.level}</div>
+        <div class="card-title">${ex.title}</div>
+        <div class="card-meta">${ex.muscles.slice(0,2).join(' · ')}</div>
+        <div class="card-pills">
+          <span class="pill">${ex.plan.saetze} Sätze</span>
+          <span class="pill">${ex.plan.wiederholungen} Wdh.</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openExercise(id) {
+  const ex = data.exercises.find(e => e.id === id);
+  if (!ex) return;
+  activeExercise = id;
+  renderGrid();
+
+  const panel = document.getElementById('detail-panel');
+  const videoEl = document.getElementById('detail-video');
+  const noVideo = document.getElementById('detail-no-video');
+
+  document.getElementById('detail-title').textContent = ex.title;
+  document.getElementById('detail-sub').textContent = ex.muscles.join(' · ');
+  document.getElementById('detail-filename').textContent = ex.file;
+
+  videoEl.src = ex.file;
+  videoEl.style.display = 'block';
+  noVideo.style.display = 'none';
+  videoEl.onerror = () => {
+    videoEl.style.display = 'none';
+    noVideo.style.display = 'flex';
+  };
+  videoEl.ontimeupdate = () => {
+    if (videoEl.duration) {
+      document.getElementById('vid-progress-fill').style.width =
+        (videoEl.currentTime / videoEl.duration * 100) + '%';
+    }
+  };
+
+  const plan = ex.plan;
+  document.getElementById('plan-rows').innerHTML = [
+    ['Sätze', plan.saetze],
+    ['Wiederholungen', plan.wiederholungen],
+    ['Pause', plan.pause],
+    ['Frequenz', plan.frequenz],
+  ].map(([l,v]) => `<div class="plan-row">
+    <span class="plan-row-label">${l}</span>
+    <span class="plan-row-val">${v}</span>
+  </div>`).join('');
+
+  document.getElementById('steps-list').innerHTML = ex.steps.map((s,i) => `
+    <li class="step-item">
+      <div class="step-num">${i+1}</div>
+      <div class="step-text">${s}</div>
+    </li>`).join('');
+
+  panel.classList.add('open');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeDetail() {
+  const panel = document.getElementById('detail-panel');
+  const videoEl = document.getElementById('detail-video');
+  panel.classList.remove('open');
+  videoEl.pause(); videoEl.src = '';
+  activeExercise = null;
+  document.getElementById('vid-progress-fill').style.width = '0%';
+  renderGrid();
+}
+
+renderSidebar();
+selectGroup('brust');
+</script>
+</body>
+</html>
